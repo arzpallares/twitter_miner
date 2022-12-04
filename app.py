@@ -178,6 +178,10 @@ class Authorizer:
         return api
 
 
+class ArgHandler:
+    """Handler Console Arguments"""
+
+
 if __name__ == "__main__":
     # Create Authorizer
     auth = Authorizer()
@@ -200,5 +204,4 @@ if __name__ == "__main__":
         tweets.append(obj)
     
     user.set_posts(tweets=tweets)
-
     handler.convert_to_json(user.cast_to_dict())
