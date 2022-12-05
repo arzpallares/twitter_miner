@@ -1,2 +1,3 @@
 python-dotenv >= 0.21.0
 tweetpy >= 4.12.0
+argparse >= 1.4.0

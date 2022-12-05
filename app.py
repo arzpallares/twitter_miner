@@ -9,6 +9,9 @@ import json
 # Environment imports
 from dotenv import load_dotenv
 
+# Argument Parser
+import argparse
+
 # Tweetpy imports
 import tweepy
 from tweepy.errors import Unauthorized
@@ -115,8 +118,24 @@ class Authorizer:
 class ArgHandler:
     """Handler Console Arguments"""
 
+    def __init__(self):
+        self.parser = argparse.ArgumentParser()
+        self.parser.add_argument('account', 
+            type=str,
+            default='elonmusk',
+            nargs='*',
+            help='Enter target account name')
+
+    def read_args(self) -> typing.List:
+        """Read command prompt arguments"""
+        return self.parser.parse_args()
+
 
 if __name__ == "__main__":
+    # Create argument handler
+    arghandler = ArgHandler()
+    args = arghandler.read_args()
+
     # Create Authorizer
     auth = Authorizer()
 
@@ -127,8 +146,8 @@ if __name__ == "__main__":
     handler = ETLHandler(api)
 
     # Get User(s)
-    user = handler.get_user_data("manutegaming")
-    user_timeline = handler.get_user_timeline(user, 1e3)
+    user = handler.get_user_data(args.account)
+    user_timeline = handler.get_user_timeline(user, 30)
 
     tweets = []
 
