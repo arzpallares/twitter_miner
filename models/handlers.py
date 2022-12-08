@@ -5,6 +5,8 @@ import typing
 
 # Data Format imports
 import json
+import yaml
+import ruamel.yaml
 
 # Environment imports
 from dotenv import load_dotenv
@@ -35,27 +37,34 @@ class ETLHandler:
     def __init__(self, api:tweepy.API) -> None:
         self.api = api
 
-    def get_user_data(self, username:str = "twitter") -> models.User:
-        breakpoint()
+    def get_user_data(self, account:str="twitter") -> models.User:
         """Get User account information"""
-        target_user = self.api.get_user(screen_name=username)
+        try:
+            target_user = self.api.get_user(screen_name=account)
 
-        id = target_user.id
-        name = target_user.name
-        location = target_user.location
-        followers = target_user.followers_count
-        friends = target_user.friends_count
+            id = target_user.id
+            name = target_user.name
+            location = target_user.location
+            followers = target_user.followers_count
+            friends = target_user.friends_count
 
-        user = models.User(
-            id=id,
-            name=name,
-            url=target_user.url,
-            location=location,
-            total_followers=followers,
-            total_friends=friends,
-            total_posts=target_user.statuses_count)
+            user = models.User(
+                id=id,
+                name=name,
+                url=target_user.url,
+                location=location,
+                total_followers=followers,
+                total_friends=friends,
+                total_posts=target_user.statuses_count)
 
-        return user
+            return user
+        
+        except tweepy.errors.NotFound as err:
+            """Build error message and return False"""
+            message = f"Error {err.response.status_code}. {err.api_messages[0]}"
+            print(message)
+            
+            return False
 
     def get_tweet_data(self, status:tweepy.models.Status) -> models.Tweet:
         """Transform Status model into a Tweet object"""
@@ -85,7 +94,7 @@ class ETLHandler:
             os.mkdir(self.path)
 
     def convert_to_json(self, twitter_dict:typing.Dict, output_name:str="file", output_folder:str=None) -> None:
-        """Convert dictionary into a json file"""
+        """Format tweets data and store it into a JSON file"""
         self.check_data_folder(output_folder=output_folder)
         
         filename = f"{self.path}/{output_name}.json"
@@ -93,6 +102,14 @@ class ETLHandler:
         with open(filename, mode="w", encoding='utf-8-sig') as file:
             json.dump(twitter_dict, file, indent=4)
 
+    def convert_to_yaml(self, twitter_dict:typing.Dict, output_name:str="file", output_folder:str=None) -> None:
+        """Format tweets data and store it into a YAML file"""
+        filename = f"{self.path}/{output_name}.yaml"
+
+        with open(filename, mode="w", encoding='utf-8-sig') as file:
+            yaml = ruamel.yaml.YAML()
+            yaml.indent(sequence=4, offset=2)
+            yaml.dump(twitter_dict, file)
 
 class Authorizer:
     """Handle Twitter API authorization"""
@@ -123,6 +140,7 @@ class ArgHandler:
         self.parser = argparse.ArgumentParser(description="Get data about twitter account and save it into a JSON file.")
         self.parser.add_argument('--account', 
             type=str,
+            default='elonmusk',
             help='Enter target account name')
 
     def read_args(self) -> typing.List:
