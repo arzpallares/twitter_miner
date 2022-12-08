@@ -38,5 +38,11 @@ if __name__ == "__main__":
         
         user.set_posts(tweets=tweets)
 
-        handler.convert_to_json(user.cast_to_dict())
-        handler.convert_to_yaml(user.cast_to_dict())
+        # Note: move to handler in the future
+        """Check if output format is a valid/available one"""
+        if args.format == 'json':
+            handler.convert_to_json(user.cast_to_dict(), args.name)
+        elif args.format == 'yaml':
+            handler.convert_to_yaml(user.cast_to_dict(), args.name)
+        else:
+            print(f"Invalid Data format: {args.format}. Available formats are: json, yaml")

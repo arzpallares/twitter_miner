@@ -37,7 +37,7 @@ class ETLHandler:
     def __init__(self, api:tweepy.API) -> None:
         self.api = api
 
-    def get_user_data(self, account:str="twitter") -> models.User:
+    def get_user_data(self, account:str="elonmusk") -> models.User:
         """Get User account information"""
         try:
             target_user = self.api.get_user(screen_name=account)
@@ -104,6 +104,8 @@ class ETLHandler:
 
     def convert_to_yaml(self, twitter_dict:typing.Dict, output_name:str="file", output_folder:str=None) -> None:
         """Format tweets data and store it into a YAML file"""
+        self.check_data_folder(output_folder=output_folder)
+
         filename = f"{self.path}/{output_name}.yaml"
 
         with open(filename, mode="w", encoding='utf-8-sig') as file:
@@ -137,11 +139,21 @@ class ArgHandler:
     """Handler Console Arguments"""
 
     def __init__(self):
-        self.parser = argparse.ArgumentParser(description="Get data about twitter account and save it into a JSON file.")
+        self.parser = argparse.ArgumentParser(description="Get data about twitter account and save it into a JSON/YAML file.")
         self.parser.add_argument('--account', 
             type=str,
             default='elonmusk',
-            help='Enter target account name')
+            help='Enter target account name. Default: elonmusk')
+
+        self.parser.add_argument('--format', 
+            type=str,
+            default='json',
+            help='Enter output format. Currently available: json, yaml. Default: json')
+
+        self.parser.add_argument('--name', 
+            type=str,
+            default='output',
+            help='Enter output file name. Default: output')
 
     def read_args(self) -> typing.List:
         """Read command prompt arguments"""
