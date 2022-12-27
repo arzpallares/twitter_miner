@@ -1,5 +1,6 @@
 python-dotenv >= 0.21.0
 tweetpy >= 4.12.0
-argparse >= 1.4.0
 PyYAML >= 6.0
 ruamel.yaml >= 0.17.21
+fastapi >= 0.88.0
+uvicorn >= 0.20.0

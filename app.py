@@ -1,17 +1,29 @@
 # -*- coding: utf-8 -*-
+# Fast API
+from fastapi import FastAPI
+
+# Data Handlers
 from models import handlers
 
-if __name__ == "__main__":
+app = FastAPI()
+
+@app.get('/')
+async def welcome():
+    return {'message': 'Welcome to Twitter Miner'}
+
+@app.get('/account/{account_name}')
+async def account(account_name:str = 'elonmusk', format:str = 'json'):
+    """Return Twitter Account Data"""
+    return main(account_name, format)
+
+def main(account:str, format:str):
     """
     This application will:
-    1- Get command prompt arguments and save it into variables
+    1- Receive a GET request with a Twitter user account
     2- Validate Twitter Auth
     3- Get User's data
     4- Save results into  a JSON and YAML files
     """
-    # Create argument handler
-    arghandler = handlers.ArgHandler()
-    args = arghandler.read_args()
 
     # Create Authorizer
     auth = handlers.Authorizer()
@@ -22,7 +34,7 @@ if __name__ == "__main__":
     handler = handlers.ETLHandler(api)
 
     # Get User(s)
-    user = handler.get_user_data(args.account)
+    user = handler.get_user_data(account)
 
     if user:
         # Run only if Account generated no exceptions
@@ -33,16 +45,12 @@ if __name__ == "__main__":
 
         for status in user_timeline:
             tweet = handler.get_tweet_data(status=status)
-            obj = tweet.cast_to_dict()
+            obj = tweet.generate_dict()
             tweets.append(obj)
         
         user.set_posts(tweets=tweets)
 
-        # Note: move to handler in the future
-        """Check if output format is a valid/available one"""
-        if args.format == 'json':
-            handler.convert_to_json(user.cast_to_dict(), args.name)
-        elif args.format == 'yaml':
-            handler.convert_to_yaml(user.cast_to_dict(), args.name)
+        if format == 'json':
+            return {'result': user.generate_dict()}
         else:
-            print(f"Invalid Data format: {args.format}. Available formats are: json, yaml")
+            return {'Message': 'Invalid file format. Available formats are JSON & YAML.'}

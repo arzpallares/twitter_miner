@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 class TwitterObj(ABC):
     """Abstract Object for common Twitter Object Functions"""
     @abstractmethod
-    def cast_to_dict(self) -> typing.Dict:
+    def generate_dict(self) -> typing.Dict:
         pass
 
 
@@ -28,7 +28,7 @@ class User(TwitterObj):
         """Set User's tweets"""
         self.tweets = tweets
 
-    def cast_to_dict(self) -> typing.Dict:
+    def generate_dict(self) -> typing.Dict:
         """Convert User data into a dictionary"""
 
         return {
@@ -56,7 +56,7 @@ class Tweet(TwitterObj):
     coordinates: typing.Dict
     entities: typing.Dict
 
-    def cast_to_dict(self) -> typing.Dict:
+    def generate_dict(self) -> typing.Dict:
         """Convert Tweet data into a dictionary"""
 
         return {

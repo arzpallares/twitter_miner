@@ -5,14 +5,10 @@ import typing
 
 # Data Format imports
 import json
-import yaml
 import ruamel.yaml
 
 # Environment imports
 from dotenv import load_dotenv
-
-# Argument Parser
-import argparse
 
 # Tweetpy imports
 import tweepy
@@ -32,7 +28,7 @@ ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET") or ""
 
 
 class ETLHandler:
-    """Handle ETL processes"""
+    """Handle ETL processes for the Twitter API"""
 
     def __init__(self, api:tweepy.API) -> None:
         self.api = api
@@ -102,7 +98,10 @@ class ETLHandler:
         with open(filename, mode="w", encoding='utf-8-sig') as file:
             json.dump(twitter_dict, file, indent=4)
 
+        return file
+
     def convert_to_yaml(self, twitter_dict:typing.Dict, output_name:str="file", output_folder:str=None) -> None:
+        """To be Implemented in API Version"""
         """Format tweets data and store it into a YAML file"""
         self.check_data_folder(output_folder=output_folder)
 
@@ -112,6 +111,9 @@ class ETLHandler:
             yaml = ruamel.yaml.YAML()
             yaml.indent(sequence=4, offset=2)
             yaml.dump(twitter_dict, file)
+
+        return file
+
 
 class Authorizer:
     """Handle Twitter API authorization"""
@@ -133,28 +135,3 @@ class Authorizer:
             raise Unauthorized(err)
 
         return api
-
-
-class ArgHandler:
-    """Handler Console Arguments"""
-
-    def __init__(self):
-        self.parser = argparse.ArgumentParser(description="Get data about twitter account and save it into a JSON/YAML file.")
-        self.parser.add_argument('--account', 
-            type=str,
-            default='elonmusk',
-            help='Enter target account name. Default: elonmusk')
-
-        self.parser.add_argument('--format', 
-            type=str,
-            default='json',
-            help='Enter output format. Currently available: json, yaml. Default: json')
-
-        self.parser.add_argument('--name', 
-            type=str,
-            default='output',
-            help='Enter output file name. Default: output')
-
-    def read_args(self) -> typing.List:
-        """Read command prompt arguments"""
-        return self.parser.parse_args()

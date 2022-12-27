@@ -4,3 +4,5 @@ data/*
 venv
 venv/*
 .env
+sample-request
+sample-request/*
